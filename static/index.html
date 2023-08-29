@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/tdesign.min.css" />
+    <link rel="shortcut icon" href="./ys.png" type="image/x-icon" />
+    <title>RuoYu-YuanShen</title>
+  </head>
+  <body>
+    <div id="app">
+      <t-table
+        :data="list"
+        :columns="columns"
+        max-height="100vh"
+        :loading="loading"
+        row-key="id"
+        :filter-value.sync="filterValue"
+        @filter-change="getData"
+        bordered
+        :editable-cell-state="editableCellState"
+      >
+        <template #status="{row}">
+          <t-tag :theme="status[row.status]">{{row.status}}</t-tag>
+        </template>
+        <template #filter-row
+          >找到 {{list.length}} 条结果
+          <t-link theme="primary" @click="resetFilter"
+            >清空筛选</t-link
+          ></template
+        >
+      </t-table>
+
+      <div v-for="(item,key,i) in dropList" :key="key">
+        <span>{{key}}：</span>
+        <span>{{item}}</span>
+      </div>
+    </div>
+    <script src="./js/vue.global.prod.js"></script>
+    <script src="./js/tdesign.min.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <script src="./js/qs.js"></script>
+    <script src="./js/index.js"></script>
+  </body>
+</html>
