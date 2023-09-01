@@ -41,6 +41,7 @@ const CONFIG = require("./config");
       specialty = [],
       drop = [],
       common_drop = [],
+      attribute = [],
     } = req.query;
     Character.findAll({
       order: [["level", "DESC"]],
@@ -53,6 +54,7 @@ const CONFIG = require("./config");
         drop: { [Op.or]: drop },
         specialty: { [Op.or]: specialty },
         common_drop: { [Op.or]: common_drop },
+        attribute: { [Op.or]: attribute },
       },
     }).then((Character) => {
       const dropList = {};
@@ -76,6 +78,7 @@ const CONFIG = require("./config");
           specialty: specialty || [],
           drop: drop || [],
           common_drop: common_drop || [],
+          attribute: attribute || [],
         },
       });
     });

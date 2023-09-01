@@ -76,20 +76,19 @@ const nity = (id) => {
           const defaults = {
             id,
             name: content.title,
-            attribute: JSON.parse(
-              JSON.parse(content.ext).c_25.filter.text
-            )[0].split("/")[1],
-            quality: JSON.parse(
-              JSON.parse(content.ext).c_25.filter.text
-            )[1].split("/")[1],
-            weapon: JSON.parse(
-              JSON.parse(content.ext).c_25.filter.text
-            )[2].split("/")[1],
-            area: JSON.parse(JSON.parse(content.ext).c_25.filter.text)[3].split(
-              "/"
-            )[1],
+            attribute: JSON.parse(JSON.parse(content.ext).c_25.filter.text)
+              .filter((item) => item.includes("元素"))[0]
+              .split("/")[1],
+            quality: JSON.parse(JSON.parse(content.ext).c_25.filter.text)
+              .filter((item) => item.includes("星级"))[0]
+              .split("/")[1],
+            weapon: JSON.parse(JSON.parse(content.ext).c_25.filter.text)
+              .filter((item) => item.includes("武器"))[0]
+              .split("/")[1],
+            area: JSON.parse(JSON.parse(content.ext).c_25.filter.text)
+              .filter((item) => item.includes("地区"))[0]
+              .split("/")[1],
           };
-
           const $0 = cheerio.load(content.contents[0].text);
           const $1 = cheerio.load(content.contents[1].text);
           $0("h2").each((i, el) => {

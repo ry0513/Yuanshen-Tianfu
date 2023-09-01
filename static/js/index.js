@@ -41,6 +41,17 @@ createApp({
           },
         },
         {
+          colKey: "attribute",
+          title: "元素",
+          align: "center",
+          filter: {
+            type: "multiple",
+            resetValue: [],
+            list: ["风", "岩", "雷", "草", "水", "火", "冰"],
+            showConfirmAndReset: true,
+          },
+        },
+        {
           colKey: "area",
           title: "地区",
           align: "center",
