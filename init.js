@@ -25,7 +25,7 @@ const talent_time = {
 };
 
 const Init = () => {
-  console.log("开始同步角色列表");
+  console.log("开始同步角色列表");  
   axios
     .get(
       `https://api-static.mihoyo.com/common/blackboard/ys_obc/v1/home/content/list?app_sn=ys_obc&channel_id=189`
@@ -51,7 +51,7 @@ const Init = () => {
             defaults,
           });
           if (created) {
-            console.log("开始获取角色数据");
+            console.log("开始获取角色数据：",item.title);
             await nity(item.content_id);
           }
         }
@@ -64,71 +64,32 @@ const nity = (id) => {
   return new Promise((resolve, reject) => {
     axios
       .get(
-        `https://api-static.mihoyo.com/common/blackboard/ys_obc/v1/content/info?app_sn=ys_obc&content_id=${id}`
+        `https://api-takumi-static.mihoyo.com/hoyowiki/genshin/wapi/entry_page?app_sn=ys_obc&entry_page_id=${id}&lang=zh-cn`
       )
       .then(
         async ({
           data: {
-            data: { content },
+            data: { page },
           },
         }) => {
-          console.log(content.title);
+         
+          const c_25 = JSON.parse(JSON.parse(page.ext.fe_ext).c_25.filter.text)
           const defaults = {
             id,
-            name: content.title,
-            attribute: JSON.parse(JSON.parse(content.ext).c_25.filter.text)
-              .filter((item) => item.includes("元素"))[0]
-              .split("/")[1],
-            quality: JSON.parse(JSON.parse(content.ext).c_25.filter.text)
-              .filter((item) => item.includes("星级"))[0]
-              .split("/")[1],
-            weapon: JSON.parse(JSON.parse(content.ext).c_25.filter.text)
-              .filter((item) => item.includes("武器"))[0]
-              .split("/")[1],
-            area: JSON.parse(JSON.parse(content.ext).c_25.filter.text)
-              .filter((item) => item.includes("地区"))[0]
-              .split("/")[1],
+            name: page.name,
+            attribute: c_25.filter((item) => item.includes("元素"))[0].split("/")[1],
+            quality: c_25.filter((item) => item.includes("星级"))[0].split("/")[1],
+            weapon: c_25.filter((item) => item.includes("武器"))[0].split("/")[1],
+            area: c_25.filter((item) => item.includes("地区"))[0].split("/")[1],
           };
-          const $0 = cheerio.load(content.contents[0].text);
-          const $1 = cheerio.load(content.contents[1].text);
-          $0("h2").each((i, el) => {
-            if ($0(el).text() === "角色突破") {
-              defaults.specialty = $0(el)
-                .next()
-                .next()
-                .find(
-                  "ul>li:nth-child(1) ul>li:nth-child(6) .obc-tmpl__icon-text"
-                )
-                .text();
-            }
-          });
-          $1("h2").each((i, el) => {
-            if ($1(el).text() === "天赋") {
-              defaults.talent = $1(el)
-                .next()
-                .next()
-                .find(
-                  "ul>li:nth-child(1)>div tbody tr:last-child td:nth-child(10)>div:nth-child(1) .obc-tmpl__icon-text"
-                )
-                .text()
-                .match(/「(.+?)」/)[1];
-              defaults.common_drop = $1(el)
-                .next()
-                .next()
-                .find(
-                  "ul>li:nth-child(1)>div tbody tr:last-child td:nth-child(10)>div:nth-child(2) .obc-tmpl__icon-text"
-                )
-                .text();
-              defaults.drop = $1(el)
-                .next()
-                .next()
-                .find(
-                  "ul>li:nth-child(1)>div tbody tr:last-child td:nth-child(10)>div:nth-child(3) .obc-tmpl__icon-text"
-                )
-                .text();
-              defaults.talent_time = talent_time[defaults.talent];
-            }
-          });
+          const materials = JSON.parse(page.modules[1].components[0].data).list[6].materials
+          defaults.specialty = materials[2].nickname;
+          const row = JSON.parse(page.modules[4].components[0].data).list[0].attr.row
+          const $0 = cheerio.load(row[row.length-1][7]);
+          defaults.talent = $0("a .name").eq(0).text().match(/「(.+?)」/)[1]
+          defaults.common_drop = $0("a .name").eq(1).text()
+          defaults.drop  = $0("a .name").eq(2).text()
+          defaults.talent_time = talent_time[defaults.talent];
           console.log(defaults);
           await Character.update(defaults, {
             where: { id },
